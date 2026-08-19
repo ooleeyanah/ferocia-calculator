@@ -12,7 +12,7 @@ const ASSESSMENT_RATE_BUFFER = 3.0; // 3.0% buffer added to interest rates
 // Tax function w/ API call
 async function getTax(income) {
     // http://localhost:3000/api/tax?income=[income]
-    const res = await fetch(`http://localhost:3000/api/tax?income=[income]`,
+    const response = await fetch(`http://localhost:3000/api/tax?income=${encodeURIComponent(income)}`,
         {
             headers: { Authorization: "Bearer pat_abcdefghijklmnopqrstuvwxyz0123456789"}
         }
@@ -26,7 +26,7 @@ async function getTax(income) {
 // HEM function w/ API call
 async function getHEM(income, dependents) {
     // http://localhost:3000/api/hem?income=[income]&dependents=[dependents]
-    const res = await fetch(`http://localhost:3000/api/hem?income=[income]&dependents=[dependents]`,
+    const response = await fetch(`http://localhost:3000/api/hem?income=${encodeURIComponent(income)}&dependents=${encodeURIComponent(dependents)}`,
         {headers: {
             Authorization: "Bearer pat_abcdefghijklmnopqrstuvwxyz0123456789"
         }
@@ -75,22 +75,22 @@ async function calculateBorrowingPower(income, dependents, expenses, creditLimit
     };
 }
 
-function runConsoleMode() {
+async function runConsoleMode() {
     const readline = require('readline');
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
     console.log("Mortgage Borrowing Power Calculator");
     console.log("===================================");
 
-    rl.question("Gross Annual Income: $", (income) => {
-        rl.question("Number of Dependents: ", (dependents) => {
-            rl.question("Declared Monthly Expenses: $", (expenses) => {
-                rl.question("Total Credit Card Limits: $", (creditLimits) => {
+    rl.question("Gross Annual Income: $", async (income) => {
+        rl.question("Number of Dependents: ", async (dependents) => {
+            rl.question("Declared Monthly Expenses: $", async (expenses) => {
+                rl.question("Total Credit Card Limits: $", async (creditLimits) => {
                     
                     // Banks assess loans using base rate + buffer for safety
                     const assessmentRate = INTEREST_RATE + ASSESSMENT_RATE_BUFFER;
 
-                    const result = calculateBorrowingPower(
+                    const result = await calculateBorrowingPower(
                         parseFloat(income),
                         parseInt(dependents),
                         parseFloat(expenses),
