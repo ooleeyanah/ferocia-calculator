@@ -76,37 +76,29 @@ async function calculateBorrowingPower(income, dependents, expenses, creditLimit
 }
 
 async function runConsoleMode() {
-    const readline = require('readline');
-    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    const readLine = require ('node:readline/promises');
+    const rl = readLine.createInterface({ input: process.stdin, output: process.stdout });
 
     console.log("Mortgage Borrowing Power Calculator");
     console.log("===================================");
-
-    rl.question("Gross Annual Income: $", async (income) => {
-        rl.question("Number of Dependents: ", async (dependents) => {
-            rl.question("Declared Monthly Expenses: $", async (expenses) => {
-                rl.question("Total Credit Card Limits: $", async (creditLimits) => {
-                    
-                    // Banks assess loans using base rate + buffer for safety
-                    const assessmentRate = INTEREST_RATE + ASSESSMENT_RATE_BUFFER;
-
-                    const result = await calculateBorrowingPower(
+    
+    const income = await rl.question("Gross Annual Income: $");
+    const dependents = await rl.question("Number of Dependents: ");
+    const expenses = await rl.question("Declared Monthly Expenses: ");
+    const creditLimits = await rl.question("Total Credit Card Limits: $ ");
+    const assessmentRate = INTEREST_RATE + ASSESSMENT_RATE_BUFFER;
+    const result = await calculateBorrowingPower(
                         parseFloat(income),
                         parseInt(dependents),
                         parseFloat(expenses),
                         parseFloat(creditLimits),
-                        assessmentRate
+                        assessmentRate  
                     );
-
-                    console.log("\n--- Calculation Summary ---");
-                    console.log(`Maximum Borrowing Power at ${INTEREST_RATE}%: $${result.maxLoanAmount.toLocaleString()}`);
-                    console.log(`Assumed Monthly Mortgage Repayment: $${result.monthlyRepayment.toLocaleString()} over 30 years`);
+    console.log("\n--- Calculation Summary ---");
+    console.log(`Maximum Borrowing Power at ${INTEREST_RATE}%: $${result.maxLoanAmount.toLocaleString()}`);
+    console.log(`Assumed Monthly Mortgage Repayment: $${result.monthlyRepayment.toLocaleString()} over 30 years`);
                     
-                    rl.close();
-                });
-            });
-        });
-    });
+    rl.close();
 }
 
 if (require.main === module) {
