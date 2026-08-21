@@ -12,6 +12,9 @@ const ASSESSMENT_RATE_BUFFER = 3.0; // 3.0% buffer added to interest rates
 // Tax function w/ API call
 async function getTax(income) {
     // http://localhost:3000/api/tax?income=[income]
+    if (isNaN(income) || income <= 0) {
+        throw new Error(`Invalid income parameter`);
+    }
     const response = await fetch(`http://localhost:3000/api/tax?income=${encodeURIComponent(income)}`,
         {
             headers: { Authorization: "Bearer pat_abcdefghijklmnopqrstuvwxyz0123456789"}
