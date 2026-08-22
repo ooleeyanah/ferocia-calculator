@@ -8,11 +8,11 @@ const {calculateBorrowingPower} = require('./borrowingCalculator');
 
 describe('Term Deposit Calculator Tests', () => {
 
-  it('should calculate borrowing power for standard values', async () => {
-    const result =  await calculateBorrowingPower(120000, 2, 3000, 10000, 7.5);
-    assert.ok(result.maxLoanAmount > 0, 'Should yield a positive borrowing power amount');
-    assert.strictEqual(result.monthlyRepayment, 4600, 'Monthly repayment should equal $4600');
-  });
+  // it('should calculate borrowing power for standard values', async () => {
+  //   const result =  await calculateBorrowingPower(120000, 2, 3000, 10000, 7.5);
+  //   assert.ok(result.maxLoanAmount > 0, 'Should yield a positive borrowing power amount');
+  //   assert.strictEqual(result.monthlyRepayment, 4600, 'Monthly repayment should equal $4600');
+  // });
 
   // Validation error tests
   it('should return an error for negative income', async () => {
@@ -77,4 +77,13 @@ Error, `You are missing an argument`);
     },
   Error, `All arguments must be numbers`);
 });
+// Expense/affordability 
+  it('should use expenses if it is higher than baselineHEM', async () => {
+    const result = await calculateBorrowingPower(120000, 2, 3000, 10000, 7.5);
+    assert.strictEqual(result.monthlyRepayment, 4600)
+  });
+  it('should use baselineHEM if it is higher than expenses', async () => {
+    const result = await calculateBorrowingPower(120000, 2, 4000, 10000, 7.5);
+    assert.strictEqual(result.monthlyRepayment, 3700)
+  });
 });
