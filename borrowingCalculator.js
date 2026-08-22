@@ -73,6 +73,13 @@ async function calculateBorrowingPower(income, dependents, expenses, creditLimit
         || creditLimits === undefined 
         || annualAssessmentRate === undefined) {
         throw new Error(`All arguments are required`);
+    } else if (
+        dependents === NaN
+        || expenses === NaN
+        || creditLimits === NaN
+        || annualAssessmentRate === NaN
+    ) {
+        throw new Error(`All arguments must be numbers`);
     }
 
     // 1. Calculate Net Monthly Income after tax deductions

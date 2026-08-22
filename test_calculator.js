@@ -62,7 +62,19 @@ Error, `You are missing an argument`);
       await calculateBorrowingPower(120000, 1, undefined, 10000);
     },
   Error, `All arguments are required`);
-  }
-);
 });
-
+// infinity should return error
+  it('should return an error if there is Infinity in any argument', async () => {
+    await assert.rejects( async () => {
+      await calculateBorrowingPower(120000, 1, Infinity, 10000);
+    },
+  Error, `Infinity cannot be used as an argument`);
+});
+// NaN should return error
+  it('should return an error if there is NaN in any argument', async () => {
+    await assert.rejects( async () => {
+      await calculateBorrowingPower("120000abc", 1, 3000, 10000);
+    },
+  Error, `All arguments must be numbers`);
+});
+});
