@@ -15,33 +15,54 @@ describe('Term Deposit Calculator Tests', () => {
   });
 
   // Validation error tests
-  it('should return an error for invalid inputs in income and dependents', async () => {
-    // testing for negative income error
+  it('should return an error for negative income', async () => {
     await assert.rejects( async () => {
       await calculateBorrowingPower(-3000, 0, 2000, 10000, 7.0);
     },
   Error, `Income cannot be negative or zero`);
-  // testing for 0 income error
+  });
+
+  it('should return an error for zero income', async () => {
   await assert.rejects( async () => {
       await calculateBorrowingPower(0, 0, 2000, 10000, 7.0);
     },
   Error, `Income cannot be negative or zero`);
-  // testing for NaN dependents
+  });
+
+  it('should return an error for non-numeric dependents', async () => {
   await assert.rejects( async () => {
       await calculateBorrowingPower(0, "meow", 2000, 10000, 7.0);
     },
   Error, `Dependents needs to be a number from zero to three`);
-  //testing for negative dependents
+  });
+
+  it('should return an error for negative dependents', async () => {
   await assert.rejects( async () => {
       await calculateBorrowingPower(0, -2, 2000, 10000, 7.0);
     },
   Error, `Dependents cannot be less than zero`);
-    // testing for float dependents
+  });
+
+  it('should return an error for fractional dependents', async () => {
   await assert.rejects( async () => {
       await calculateBorrowingPower(0, 2.5, 2000, 10000, 7.0);
     },
   Error, `Dependents needs to be a whole number`);  
   });
 
+  it('should return an error for missing arguments', async () => {
+  await assert.rejects ( async () => {
+      await calculateBorrowingPower();
+  },
+Error, `You are missing an argument`);
+  });
+  //Undefined arguments in calculateBorrowingPower
+  it('should return an error if any arguments are undefined', async () => {
+    await assert.rejects( async () => {
+      await calculateBorrowingPower(120000, 1, undefined, 10000);
+    },
+  Error, `All arguments are required`);
+  }
+);
 });
 
