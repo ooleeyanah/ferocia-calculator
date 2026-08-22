@@ -12,6 +12,7 @@ const ASSESSMENT_RATE_BUFFER = 3.0; // 3.0% buffer added to interest rates
 // Tax function w/ API call
 async function getTax(income) {
     // http://localhost:3000/api/tax?income=[income]
+    try {
     if (isNaN(income) || income <= 0) {
         throw new Error(`Invalid income parameter`);
     }
@@ -19,15 +20,20 @@ async function getTax(income) {
         {
             headers: { Authorization: "Bearer pat_abcdefghijklmnopqrstuvwxyz0123456789"}
         }
-    );
+    
+    ); 
+    const data = await response.json();
+
+    return data.tax;
+} catch (error) {
     if (!response.ok) {
         throw new Error(`Request for tax has failed: ${response.status}`);
-    }
-    const data = await response.json();
-    return data.tax;
+    }}
 }
+
 // HEM function w/ API call
 async function getHEM(income, dependents) {
+    try {
     if (isNaN(income) || income <= 0) {
         throw new Error(`Invalid income parameter`);
     }
@@ -41,11 +47,15 @@ async function getHEM(income, dependents) {
         }
         }
     );
+    const data = await response.json();
+    return data.hem;
+} catch (error) {
     if (!response.ok) {
         throw new Error(`Request for HEM has failed: ${response.status}`);
     }
-    const data = await response.json();
-    return data.hem;
+}
+    // const data = await response.json();
+    // return data.hem;
 }
 
 /**
