@@ -36,6 +36,11 @@ describe('Term Deposit Calculator Tests', () => {
       await calculateBorrowingPower(0, -2, 2000, 10000, 7.0);
     },
   Error, `Dependents cannot be less than zero`);
+    // testing for float dependents
+  await assert.rejects( async () => {
+      await calculateBorrowingPower(0, 2.5, 2000, 10000, 7.0);
+    },
+  Error, `Dependents needs to be a whole number`);  
   });
 
 });

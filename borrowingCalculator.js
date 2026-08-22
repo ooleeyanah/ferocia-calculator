@@ -44,6 +44,8 @@ async function getHEM(income, dependents) {
         throw new Error(`Dependents needs to be a number from zero to three`);
     } else if (dependents < 0) {
         throw new Error(`Dependents cannot be less than zero`)
+    } else if (dependents === !Number.isInteger) {
+        throw new Error(`Dependents needs to be a whole number`)
     }
     try {
     // http://localhost:3000/api/hem?income=[income]&dependents=[dependents]
