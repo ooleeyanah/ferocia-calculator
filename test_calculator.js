@@ -15,7 +15,7 @@ describe('Term Deposit Calculator Tests', () => {
   });
 
   // Validation error tests
-  it('should return an error for invalid negative inputs', async () => {
+  it('should return an error for invalid inputs', async () => {
     // testing for negative income error
     await assert.rejects( async () => {
       await calculateBorrowingPower(-3000, 0, 2000, 10000, 7.0);
@@ -26,6 +26,16 @@ describe('Term Deposit Calculator Tests', () => {
       await calculateBorrowingPower(0, 0, 2000, 10000, 7.0);
     },
   Error, `Income cannot be negative or zero`);
+  // testing for NaN dependents
+  await assert.rejects( async () => {
+      await calculateBorrowingPower(0, "meow", 2000, 10000, 7.0);
+    },
+  Error, `Dependents needs to be a number from zero to three`);
+  //testing for negative dependents
+  await assert.rejects( async () => {
+      await calculateBorrowingPower(0, -2, 2000, 10000, 7.0);
+    },
+  Error, `Dependents cannot be less than zero`);
   });
 
 });

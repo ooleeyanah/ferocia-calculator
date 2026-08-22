@@ -35,13 +35,17 @@ async function getTax(income) {
 
 // HEM function w/ API call
 async function getHEM(income, dependents) {
+        if (isNaN(income)) {
+        throw new Error(`Income needs to be a positive number`);
+    } else if (income <= 0) {
+        throw new Error(`Income cannot be negative or zero`)
+    }
+    if (isNaN(dependents)) {
+        throw new Error(`Dependents needs to be a number from zero to three`);
+    } else if (dependents < 0) {
+        throw new Error(`Dependents cannot be less than zero`)
+    }
     try {
-    if (isNaN(income) || income <= 0) {
-        throw new Error(`Invalid income parameter`);
-    }
-    if (isNaN(dependents) || dependents < 0) {
-        throw new Error(`Invalid dependents parameter`);
-    }
     // http://localhost:3000/api/hem?income=[income]&dependents=[dependents]
     const response = await fetch(`http://localhost:3000/api/hem?income=${encodeURIComponent(income)}&dependents=${encodeURIComponent(dependents)}`,
         {headers: {
@@ -52,9 +56,7 @@ async function getHEM(income, dependents) {
     const data = await response.json();
     return data.hem;
 } catch (error) {
-    if (!response.ok) {
         throw new Error(`Request for HEM has failed: ${response.status}`);
-    }
 }
 }
 
