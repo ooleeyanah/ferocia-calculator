@@ -15,7 +15,7 @@ describe('Term Deposit Calculator Tests', () => {
   });
 
   // Validation error tests
-  it('should return an error for invalid inputs', async () => {
+  it('should return an error for invalid inputs in income and dependents', async () => {
     // testing for negative income error
     await assert.rejects( async () => {
       await calculateBorrowingPower(-3000, 0, 2000, 10000, 7.0);
