@@ -99,5 +99,12 @@ Error, `You are missing an argument`);
     const result = await calculateBorrowingPower(120000, 2, 9000, 10000, 7.5);
     assert.strictEqual(result.maxLoanAmount, 0);
     assert.strictEqual(result.monthlyRepayment, 0);
-  })
-});
+  });
+  it('should show zero credit card limits if credit limits are zero', async () => {
+    //creditcardliability is private so i have to make a new var to calc
+    // so showing difference between 0 and 10000 ccl should show 10% of 10000 which is 300
+    const noCreditLimit = await calculateBorrowingPower(120000, 2, 3000, 0, 7.5);
+    const creditLimit = await calculateBorrowingPower(120000, 2, 3000, 10000, 7.5);
+    assert.strictEqual(noCreditLimit.monthlyRepayment - creditLimit.monthlyRepayment, 300);
+  });
+})
