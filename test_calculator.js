@@ -14,7 +14,7 @@ describe('Term Deposit Calculator Tests', () => {
   //   assert.strictEqual(result.monthlyRepayment, 4600, 'Monthly repayment should equal $4600');
   // });
 
-  // Validation error tests
+// Validation error tests
   it('should return an error for negative income', async () => {
     await assert.rejects( async () => {
       await calculateBorrowingPower(-3000, 0, 2000, 10000, 7.0);
@@ -63,14 +63,14 @@ Error, `You are missing an argument`);
     },
   Error, `All arguments are required`);
 });
-// infinity should return error
+  // infinity should return error
   it('should return an error if there is Infinity in any argument', async () => {
     await assert.rejects( async () => {
       await calculateBorrowingPower(120000, 1, Infinity, 10000);
     },
   Error, `Infinity cannot be used as an argument`);
 });
-// NaN should return error
+  // NaN should return error
   it('should return an error if there is NaN in any argument', async () => {
     await assert.rejects( async () => {
       await calculateBorrowingPower("120000abc", 1, 3000, 10000);
@@ -107,4 +107,5 @@ Error, `You are missing an argument`);
     const creditLimit = await calculateBorrowingPower(120000, 2, 3000, 10000, 7.5);
     assert.strictEqual(noCreditLimit.monthlyRepayment - creditLimit.monthlyRepayment, 300);
   });
+
 })
