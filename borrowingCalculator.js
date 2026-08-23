@@ -117,7 +117,7 @@ async function calculateBorrowingPower(income, dependents, expenses, creditLimit
 async function runConsoleMode() {
     const readLine = require ('node:readline/promises');
     const rl = readLine.createInterface({ input: process.stdin, output: process.stdout });
-
+try {
     console.log("Mortgage Borrowing Power Calculator");
     console.log("===================================");
     
@@ -136,8 +136,11 @@ async function runConsoleMode() {
     console.log("\n--- Calculation Summary ---");
     console.log(`Maximum Borrowing Power at ${INTEREST_RATE}%: $${result.maxLoanAmount.toLocaleString()}`);
     console.log(`Assumed Monthly Mortgage Repayment: $${result.monthlyRepayment.toLocaleString()} over 30 years`);
-                    
+          } catch (error){
+            console.error(error.message);
+          } finally {
     rl.close();
+    }
 }
 
 if (require.main === module) {
