@@ -107,5 +107,28 @@ Error, `You are missing an argument`);
     const creditLimit = await calculateBorrowingPower(120000, 2, 3000, 10000, 7.5);
     assert.strictEqual(noCreditLimit.monthlyRepayment - creditLimit.monthlyRepayment, 300);
   });
+// tax boundaries
+it('should calculate monthly repayment just below the $20,000 tax threshold', async () => {
+    const result = await calculateBorrowingPower(
+      19999, 0, 0, 0, 7.5
+    );
 
+    assert.strictEqual(result.monthlyRepayment, 66.58);
+  });
+
+  it('should calculate monthly repayment at the $20,000 tax threshold', async () => {
+    const result = await calculateBorrowingPower(
+      20000, 0, 0, 0, 7.5
+    );
+
+    assert.strictEqual(result.monthlyRepayment, 66.67);
+  });
+
+  it('should calculate monthly repayment just above the $20,000 tax threshold', async () => {
+    const result = await calculateBorrowingPower(
+      20001, 0, 0, 0, 7.5
+    );
+
+    assert.strictEqual(result.monthlyRepayment, 66.75);
+  });
 })
