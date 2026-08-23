@@ -131,4 +131,39 @@ it('should calculate monthly repayment just below the $20,000 tax threshold', as
 
     assert.strictEqual(result.monthlyRepayment, 66.75);
   });
+  it('should calculate monthly repayment just below the $50,000 tax threshold', async () => {
+  const result = await calculateBorrowingPower(49999, 0, 0, 0, 7.5);
+
+  assert.strictEqual(result.monthlyRepayment, 2524.92);
+});
+
+it('should calculate monthly repayment at the $50,000 tax threshold', async () => {
+  const result = await calculateBorrowingPower(50000, 0, 0, 0, 7.5);
+
+  assert.strictEqual(result.monthlyRepayment, 2191.67);
+});
+
+it('should calculate monthly repayment just above the $50,000 tax threshold', async () => {
+  const result = await calculateBorrowingPower(50001, 0, 0, 0, 7.5);
+
+  assert.strictEqual(result.monthlyRepayment, 2191.75);
+});
+
+it('should calculate monthly repayment just below the $100,000 tax threshold', async () => {
+  const result = await calculateBorrowingPower(99999, 0, 0, 0, 7.5);
+
+  assert.strictEqual(result.monthlyRepayment, 4716.58);
+});
+
+it('should calculate monthly repayment at the $100,000 tax threshold', async () => {
+  const result = await calculateBorrowingPower(100000, 0, 0, 0, 7.5);
+
+  assert.strictEqual(result.monthlyRepayment, 4716.67);
+});
+
+it('should calculate monthly repayment just above the $100,000 tax threshold', async () => {
+  const result = await calculateBorrowingPower(100001, 0, 0, 0, 7.5);
+
+  assert.strictEqual(result.monthlyRepayment, 4716.75);
+});
 })
