@@ -86,4 +86,9 @@ Error, `You are missing an argument`);
     const result = await calculateBorrowingPower(120000, 2, 4000, 10000, 7.5);
     assert.strictEqual(result.monthlyRepayment, 3700)
   });
+  it('should return zero when repayment capacity equals zero', async () => {
+    const result = await calculateBorrowingPower(120000, 2, 8075, 10000, 7.5);
+    assert.strictEqual(result.maxLoanAmount, 0);
+    assert.strictEqual(result.monthlyRepayment, 0);
+  });
 });
