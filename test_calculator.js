@@ -87,8 +87,17 @@ Error, `You are missing an argument`);
     assert.strictEqual(result.monthlyRepayment, 3700)
   });
   it('should return zero when repayment capacity equals zero', async () => {
+    // net monthly income = 8375, HEM = 3100, CCL = 300
+    // 8375 - 8075 - 300 = 0
     const result = await calculateBorrowingPower(120000, 2, 8075, 10000, 7.5);
     assert.strictEqual(result.maxLoanAmount, 0);
     assert.strictEqual(result.monthlyRepayment, 0);
   });
+  it('should return zero when repayment capacity is below zero', async () => {
+    // net monthly income = 8375, HEM = 9000, CCL = 300
+    // 8375 - 90000 - 300 = -925
+    const result = await calculateBorrowingPower(120000, 2, 9000, 10000, 7.5);
+    assert.strictEqual(result.maxLoanAmount, 0);
+    assert.strictEqual(result.monthlyRepayment, 0);
+  })
 });
