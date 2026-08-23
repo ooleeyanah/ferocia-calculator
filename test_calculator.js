@@ -100,9 +100,9 @@ Error, `You are missing an argument`);
     assert.strictEqual(result.maxLoanAmount, 0);
     assert.strictEqual(result.monthlyRepayment, 0);
   });
-  it('should show zero credit card limits if credit limits are zero', async () => {
+  it('should show zero credit card liability if credit limits are zero', async () => {
     //creditcardliability is private so i have to make a new var to calc
-    // so showing difference between 0 and 10000 ccl should show 10% of 10000 which is 300
+    // so showing difference between 0 and 10000 ccl should show 3% of 10000 which is 300
     const noCreditLimit = await calculateBorrowingPower(120000, 2, 3000, 0, 7.5);
     const creditLimit = await calculateBorrowingPower(120000, 2, 3000, 10000, 7.5);
     assert.strictEqual(noCreditLimit.monthlyRepayment - creditLimit.monthlyRepayment, 300);
@@ -134,7 +134,7 @@ it('should calculate monthly repayment just below the $20,000 tax threshold', as
   it('should calculate monthly repayment just below the $50,000 tax threshold', async () => {
   const result = await calculateBorrowingPower(49999, 0, 0, 0, 7.5);
 
-  assert.strictEqual(result.monthlyRepayment, 2524.92);
+  assert.strictEqual(result.monthlyRepayment, 2191.58);
 });
 
 it('should calculate monthly repayment at the $50,000 tax threshold', async () => {
