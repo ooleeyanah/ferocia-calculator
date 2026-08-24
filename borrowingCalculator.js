@@ -9,21 +9,28 @@ const LOAN_TERM_MONTHS = 360; // 30 Years
 const INTEREST_RATE = 7.0; // 7.0% baseline interest rate
 const ASSESSMENT_RATE_BUFFER = 3.0; // 3.0% buffer added to interest rates
 
+function validateIncome(income) {
+    if (isNaN(income)) {
+        throw new Error(`Income needs to be a float number`);
+    } else if (income <= 0) {
+        throw new Error(`Income needs to be positive`);
+    };
+}
+function validateDependents(dependents) {
+    if (isNaN(dependents) || Number.isInteger(dependents) === false) {
+        throw new Error(`Dependents needs to be a number`);
+    } else if (dependents < 0) {
+        throw new Error(`Dependents needs to be zero or a positive number`);
+    };
+}
 // Tax function w/ API call
 async function getTax(income) {
-    // http://localhost:3000/api/tax?income=[income]
-    if (isNaN(income)) {
-        throw new Error(`Income needs to be a positive number`);
-    } else if (income <= 0) {
-        throw new Error(`Income cannot be negative or zero`)
-    }
+    validateIncome(income);
     try {
-
         const response = await fetch(`http://localhost:3000/api/tax?income=${encodeURIComponent(income)}`,
             {
                 headers: { Authorization: "Bearer pat_abcdefghijklmnopqrstuvwxyz0123456789" }
             }
-
         );
         const data = await response.json();
 
@@ -35,20 +42,9 @@ async function getTax(income) {
 
 // HEM function w/ API call
 async function getHEM(income, dependents) {
-    if (isNaN(income)) {
-        throw new Error(`Income needs to be a positive number`);
-    } else if (income <= 0) {
-        throw new Error(`Income cannot be negative or zero`)
-    }
-    if (isNaN(dependents)) {
-        throw new Error(`Dependents needs to be a number from zero to three`);
-    } else if (dependents < 0) {
-        throw new Error(`Dependents cannot be less than zero`)
-    } else if (Number.isInteger(dependents) === false) {
-        throw new Error(`Dependents needs to be a whole number`)
-    }
+    validateIncome(income);
+    validateDependents(dependents);
     try {
-        // http://localhost:3000/api/hem?income=[income]&dependents=[dependents]
         const response = await fetch(`http://localhost:3000/api/hem?income=${encodeURIComponent(income)}&dependents=${encodeURIComponent(dependents)}`,
             {
                 headers: {
@@ -57,6 +53,7 @@ async function getHEM(income, dependents) {
             }
         );
         const data = await response.json();
+        // TODO: handle errors from API
         return data.hem;
     } catch (error) {
         throw new Error(`Request for HEM has failed: ${response.status}`);
@@ -67,19 +64,10 @@ async function getHEM(income, dependents) {
  * Calculates the total borrowing power amount and the monthly repayment configuration
  */
 async function calculateBorrowingPower(income, dependents, expenses, creditLimits, annualAssessmentRate) {
-
-    if (income === undefined
-        || dependents === undefined
-        || expenses === undefined
-        || creditLimits === undefined
-        || annualAssessmentRate === undefined) {
+    if ([income, dependents, expenses, creditLimits, annualAssessmentRate].some(p => p === undefined)) {
         throw new Error(`All arguments are required`);
-    } else if (
-        dependents === NaN
-        || expenses === NaN
-        || creditLimits === NaN
-        || annualAssessmentRate === NaN
-    ) {
+    }
+    if ([income, dependents, expenses, creditLimits, annualAssessmentRate].some(p => p === NaN)) {
         throw new Error(`All arguments must be numbers`);
     }
 
