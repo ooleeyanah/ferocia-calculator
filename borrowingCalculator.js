@@ -12,30 +12,30 @@ const ASSESSMENT_RATE_BUFFER = 3.0; // 3.0% buffer added to interest rates
 // Tax function w/ API call
 async function getTax(income) {
     // http://localhost:3000/api/tax?income=[income]
-     if (isNaN(income)) {
+    if (isNaN(income)) {
         throw new Error(`Income needs to be a positive number`);
-    } else if (income <= 0){
+    } else if (income <= 0) {
         throw new Error(`Income cannot be negative or zero`)
     }
     try {
-   
-    const response = await fetch(`http://localhost:3000/api/tax?income=${encodeURIComponent(income)}`,
-        {
-            headers: { Authorization: "Bearer pat_abcdefghijklmnopqrstuvwxyz0123456789"}
-        }
-    
-    ); 
-    const data = await response.json();
 
-    return data.tax;
-} catch (error) {
+        const response = await fetch(`http://localhost:3000/api/tax?income=${encodeURIComponent(income)}`,
+            {
+                headers: { Authorization: "Bearer pat_abcdefghijklmnopqrstuvwxyz0123456789" }
+            }
+
+        );
+        const data = await response.json();
+
+        return data.tax;
+    } catch (error) {
         throw new Error(`Request for tax has failed: ${response.status}`);
     }
 }
 
 // HEM function w/ API call
 async function getHEM(income, dependents) {
-        if (isNaN(income)) {
+    if (isNaN(income)) {
         throw new Error(`Income needs to be a positive number`);
     } else if (income <= 0) {
         throw new Error(`Income cannot be negative or zero`)
@@ -44,33 +44,34 @@ async function getHEM(income, dependents) {
         throw new Error(`Dependents needs to be a number from zero to three`);
     } else if (dependents < 0) {
         throw new Error(`Dependents cannot be less than zero`)
-    } else if (dependents === !Number.isInteger) {
+    } else if (Number.isInteger(dependents) === false) {
         throw new Error(`Dependents needs to be a whole number`)
     }
     try {
-    // http://localhost:3000/api/hem?income=[income]&dependents=[dependents]
-    const response = await fetch(`http://localhost:3000/api/hem?income=${encodeURIComponent(income)}&dependents=${encodeURIComponent(dependents)}`,
-        {headers: {
-            Authorization: "Bearer pat_abcdefghijklmnopqrstuvwxyz0123456789"
-        }
-        }
-    );
-    const data = await response.json();
-    return data.hem;
-} catch (error) {
+        // http://localhost:3000/api/hem?income=[income]&dependents=[dependents]
+        const response = await fetch(`http://localhost:3000/api/hem?income=${encodeURIComponent(income)}&dependents=${encodeURIComponent(dependents)}`,
+            {
+                headers: {
+                    Authorization: "Bearer pat_abcdefghijklmnopqrstuvwxyz0123456789"
+                }
+            }
+        );
+        const data = await response.json();
+        return data.hem;
+    } catch (error) {
         throw new Error(`Request for HEM has failed: ${response.status}`);
-}
+    }
 }
 
 /**
  * Calculates the total borrowing power amount and the monthly repayment configuration
  */
 async function calculateBorrowingPower(income, dependents, expenses, creditLimits, annualAssessmentRate) {
-    
-    if (income === undefined 
-        || dependents === undefined 
-        || expenses === undefined 
-        || creditLimits === undefined 
+
+    if (income === undefined
+        || dependents === undefined
+        || expenses === undefined
+        || creditLimits === undefined
         || annualAssessmentRate === undefined) {
         throw new Error(`All arguments are required`);
     } else if (
@@ -115,31 +116,31 @@ async function calculateBorrowingPower(income, dependents, expenses, creditLimit
 }
 
 async function runConsoleMode() {
-    const readLine = require ('node:readline/promises');
+    const readLine = require('node:readline/promises');
     const rl = readLine.createInterface({ input: process.stdin, output: process.stdout });
-try {
-    console.log("Mortgage Borrowing Power Calculator");
-    console.log("===================================");
-    
-    const income = await rl.question("Gross Annual Income: $");
-    const dependents = await rl.question("Number of Dependents: ");
-    const expenses = await rl.question("Declared Monthly Expenses: ");
-    const creditLimits = await rl.question("Total Credit Card Limits: $ ");
-    const assessmentRate = INTEREST_RATE + ASSESSMENT_RATE_BUFFER;
-    const result = await calculateBorrowingPower(
-                        parseFloat(income),
-                        parseInt(dependents),
-                        parseFloat(expenses),
-                        parseFloat(creditLimits),
-                        assessmentRate  
-                    );
-    console.log("\n--- Calculation Summary ---");
-    console.log(`Maximum Borrowing Power at ${INTEREST_RATE}%: $${result.maxLoanAmount.toLocaleString()}`);
-    console.log(`Assumed Monthly Mortgage Repayment: $${result.monthlyRepayment.toLocaleString()} over 30 years`);
-          } catch (error){
-            console.error(error.message);
-          } finally {
-    rl.close();
+    try {
+        console.log("Mortgage Borrowing Power Calculator");
+        console.log("===================================");
+
+        const income = await rl.question("Gross Annual Income: $");
+        const dependents = await rl.question("Number of Dependents: ");
+        const expenses = await rl.question("Declared Monthly Expenses: ");
+        const creditLimits = await rl.question("Total Credit Card Limits: $ ");
+        const assessmentRate = INTEREST_RATE + ASSESSMENT_RATE_BUFFER;
+        const result = await calculateBorrowingPower(
+            parseFloat(income),
+            parseInt(dependents),
+            parseFloat(expenses),
+            parseFloat(creditLimits),
+            assessmentRate
+        );
+        console.log("\n--- Calculation Summary ---");
+        console.log(`Maximum Borrowing Power at ${INTEREST_RATE}%: $${result.maxLoanAmount.toLocaleString()}`);
+        console.log(`Assumed Monthly Mortgage Repayment: $${result.monthlyRepayment.toLocaleString()} over 30 years`);
+    } catch (error) {
+        console.error(error.message);
+    } finally {
+        rl.close();
     }
 }
 
