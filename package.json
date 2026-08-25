@@ -1,10 +1,12 @@
 {
   "devDependencies": {
-    "mocha": "^11.7.0"
+    "mocha": "^11.7.0",
+    "nyc": "^18.0.0"
   },
   "scripts": {
     "api": "node server.js",
     "test": "mocha test_calculator.js",
+    "test:coverage": "nyc mocha test_calculator.js",
     "start": "node borrowingCalculator.js"
   }
 }

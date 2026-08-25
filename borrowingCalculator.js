@@ -15,6 +15,7 @@ function validateIncome(income) {
     } else if (income <= 0) {
         throw new Error(`Income needs to be positive`);
     };
+    return true;
 }
 function validateDependents(dependents) {
     if (isNaN(dependents) || Number.isInteger(dependents) === false) {
@@ -22,6 +23,7 @@ function validateDependents(dependents) {
     } else if (dependents < 0) {
         throw new Error(`Dependents needs to be zero or a positive number`);
     };
+    return true;
 }
 // Tax function w/ API call
 async function getTax(income) {
@@ -136,4 +138,4 @@ if (require.main === module) {
     runConsoleMode();
 }
 
-module.exports = { calculateBorrowingPower };
+module.exports = { calculateBorrowingPower, validateIncome, validateDependents };
