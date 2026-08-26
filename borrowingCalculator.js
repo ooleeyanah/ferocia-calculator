@@ -17,14 +17,18 @@ class BorrowingCalculator {
     validateIncome(income) {
         if (isNaN(income)) {
             throw new Error(`Income needs to be a float number`);
+        } else if (!Number.isFinite(income)) {
+            throw new Error(`Infinity cannot be used as an argument`);
         } else if (income <= 0) {
             throw new Error(`Income needs to be positive`);
-        };
+        }
         return true;
     }
     validateDependents(dependents) {
         if (isNaN(dependents) || Number.isInteger(dependents) === false) {
             throw new Error(`Dependents needs to be a number`);
+        } else if (!Number.isFinite(dependents)) {
+            throw new Error(`Infinity cannot be used as an argument`);
         } else if (dependents < 0) {
             throw new Error(`Dependents needs to be zero or a positive number`);
         };
