@@ -4,17 +4,19 @@
 
 
 const assert = require('assert');
-const { calculateBorrowingPower, validateIncome, validateDependents } = require('./borrowingCalculator');
+const { BorrowingCalculator } = require('./borrowingCalculator');
+
+const calculator = new BorrowingCalculator({ authToken: 'pat_abcdefghijklmnopqrstuvwxyz0123456789' });
 
 describe('Testing validateIncome', () => {
   it('should return true for a valid integer value', () => {
-    assert.ok(() => validateIncome(12000))
+    assert.ok(() => calculator.validateIncome(12000))
   });
   it('should return true for valid float value', () => {
-    assert.ok(() => validateIncome(12000.55))
+    assert.ok(() => calculator.validateIncome(12000.55))
   });
   it('should throw an error if income is NaN', () => {
-    assert.throws(() => validateIncome("meow"),
+    assert.throws(() => calculator.validateIncome("meow"),
       {
         name: 'Error',
         message: 'Income needs to be a float number'
@@ -22,7 +24,7 @@ describe('Testing validateIncome', () => {
     )
   });
   it('should throw an error if income is negative', () => {
-    assert.throws(() => validateIncome(-300),
+    assert.throws(() => calculator.validateIncome(-300),
       {
         name: 'Error',
         message: 'Income needs to be positive'
@@ -30,7 +32,7 @@ describe('Testing validateIncome', () => {
     )
   });
   it('should throw an error if income is zero', () => {
-    assert.throws(() => validateIncome(0),
+    assert.throws(() => calculator.validateIncome(0),
       {
         name: 'Error',
         message: 'Income needs to be positive'
@@ -41,13 +43,13 @@ describe('Testing validateIncome', () => {
 
 describe('Testing validateDependents', () => {
   it('should return true for a valid integer value', () => {
-    assert.ok(() => validateDependents(2))
+    assert.ok(() => calculator.validateDependents(2))
   });
   it('should return true for zero', () => {
-    assert.ok(() => validateDependents(0))
+    assert.ok(() => calculator.validateDependents(0))
   });
   it('should throw an error if dependents is NaN', () => {
-    assert.throws(() => validateDependents("meow"),
+    assert.throws(() => calculator.validateDependents("meow"),
       {
         name: 'Error',
         message: 'Dependents needs to be a number'
@@ -55,7 +57,7 @@ describe('Testing validateDependents', () => {
     )
   });
   it('should throw an error if income is not an integer', () => {
-    assert.throws(() => validateDependents(2.5),
+    assert.throws(() => calculator.validateDependents(2.5),
       {
         name: 'Error',
         message: 'Dependents needs to be a number'
@@ -63,7 +65,7 @@ describe('Testing validateDependents', () => {
     )
   });
   it('should throw an error if dependents is negative', () => {
-    assert.throws(() => validateDependents(-2),
+    assert.throws(() => calculator.validateDependents(-2),
       {
         name: 'Error',
         message: 'Dependents needs to be zero or a positive number'
@@ -75,108 +77,102 @@ describe('Testing validateDependents', () => {
 
 describe('Term Deposit Calculator Tests', () => {
 
-  // it('should calculate borrowing power for standard values', async () => {
-  //   const result =  await calculateBorrowingPower(120000, 2, 3000, 10000, 7.5);
-  //   assert.ok(result.maxLoanAmount > 0, 'Should yield a positive borrowing power amount');
-  //   assert.strictEqual(result.monthlyRepayment, 4600, 'Monthly repayment should equal $4600');
-  // });
-
   // Validation error tests
   it('should return an error for negative income', async () => {
     await assert.rejects(async () => {
-      await calculateBorrowingPower(-3000, 0, 2000, 10000, 7.0);
+      await calculator.calculateBorrowingPower(-3000, 0, 2000, 10000, 7.0);
     },
       Error, `Income cannot be negative or zero`);
   });
 
   it('should return an error for zero income', async () => {
     await assert.rejects(async () => {
-      await calculateBorrowingPower(0, 0, 2000, 10000, 7.0);
+      await calculator.calculateBorrowingPower(0, 0, 2000, 10000, 7.0);
     },
       Error, `Income cannot be negative or zero`);
   });
 
   it('should return an error for non-numeric dependents', async () => {
     await assert.rejects(async () => {
-      await calculateBorrowingPower(0, "meow", 2000, 10000, 7.0);
+      await calculator.calculateBorrowingPower(0, "meow", 2000, 10000, 7.0);
     },
       Error, `Dependents needs to be a number from zero to three`);
   });
 
   it('should return an error for negative dependents', async () => {
     await assert.rejects(async () => {
-      await calculateBorrowingPower(0, -2, 2000, 10000, 7.0);
+      await calculator.calculateBorrowingPower(0, -2, 2000, 10000, 7.0);
     },
       Error, `Dependents cannot be less than zero`);
   });
 
   it('should return an error for fractional dependents', async () => {
     await assert.rejects(async () => {
-      await calculateBorrowingPower(0, 2.5, 2000, 10000, 7.0);
+      await calculator.calculateBorrowingPower(0, 2.5, 2000, 10000, 7.0);
     },
       Error, `Dependents needs to be a whole number`);
   });
 
   it('should return an error for missing arguments', async () => {
     await assert.rejects(async () => {
-      await calculateBorrowingPower();
+      await calculator.calculateBorrowingPower();
     },
       Error, `You are missing an argument`);
   });
   //Undefined arguments in calculateBorrowingPower
   it('should return an error if any arguments are undefined', async () => {
     await assert.rejects(async () => {
-      await calculateBorrowingPower(120000, 1, undefined, 10000);
+      await calculator.calculateBorrowingPower(120000, 1, undefined, 10000);
     },
       Error, `All arguments are required`);
   });
   // infinity should return error
   it('should return an error if there is Infinity in any argument', async () => {
     await assert.rejects(async () => {
-      await calculateBorrowingPower(120000, 1, Infinity, 10000);
+      await calculator.calculateBorrowingPower(120000, 1, Infinity, 10000);
     },
       Error, `Infinity cannot be used as an argument`);
   });
   // NaN should return error
   it('should return an error if there is NaN in any argument', async () => {
     await assert.rejects(async () => {
-      await calculateBorrowingPower("120000abc", 1, 3000, 10000);
+      await calculator.calculateBorrowingPower("120000abc", 1, 3000, 10000);
     },
       Error, `All arguments must be numbers`);
   });
   // Expense/affordability 
   it('should use expenses if it is higher than baselineHEM', async () => {
-    const result = await calculateBorrowingPower(120000, 2, 3000, 10000, 7.5);
+    const result = await calculator.calculateBorrowingPower(120000, 2, 3000, 10000, 7.5);
     assert.strictEqual(result.monthlyRepayment, 4600)
   });
   it('should use baselineHEM if it is higher than expenses', async () => {
-    const result = await calculateBorrowingPower(120000, 2, 4000, 10000, 7.5);
+    const result = await calculator.calculateBorrowingPower(120000, 2, 4000, 10000, 7.5);
     assert.strictEqual(result.monthlyRepayment, 3700)
   });
   it('should return zero when repayment capacity equals zero', async () => {
     // net monthly income = 8375, HEM = 3100, CCL = 300
     // 8375 - 8075 - 300 = 0
-    const result = await calculateBorrowingPower(120000, 2, 8075, 10000, 7.5);
+    const result = await calculator.calculateBorrowingPower(120000, 2, 8075, 10000, 7.5);
     assert.strictEqual(result.maxLoanAmount, 0);
     assert.strictEqual(result.monthlyRepayment, 0);
   });
   it('should return zero when repayment capacity is below zero', async () => {
     // net monthly income = 8375, HEM = 9000, CCL = 300
     // 8375 - 90000 - 300 = -925
-    const result = await calculateBorrowingPower(120000, 2, 9000, 10000, 7.5);
+    const result = await calculator.calculateBorrowingPower(120000, 2, 9000, 10000, 7.5);
     assert.strictEqual(result.maxLoanAmount, 0);
     assert.strictEqual(result.monthlyRepayment, 0);
   });
   it('should show zero credit card liability if credit limits are zero', async () => {
     //creditcardliability is private so i have to make a new var to calc
     // so showing difference between 0 and 10000 ccl should show 3% of 10000 which is 300
-    const noCreditLimit = await calculateBorrowingPower(120000, 2, 3000, 0, 7.5);
-    const creditLimit = await calculateBorrowingPower(120000, 2, 3000, 10000, 7.5);
+    const noCreditLimit = await calculator.calculateBorrowingPower(120000, 2, 3000, 0, 7.5);
+    const creditLimit = await calculator.calculateBorrowingPower(120000, 2, 3000, 10000, 7.5);
     assert.strictEqual(noCreditLimit.monthlyRepayment - creditLimit.monthlyRepayment, 300);
   });
   // tax boundaries
   it('should calculate monthly repayment just below the $20,000 tax threshold', async () => {
-    const result = await calculateBorrowingPower(
+    const result = await calculator.calculateBorrowingPower(
       19999, 0, 0, 0, 7.5
     );
 
@@ -184,7 +180,7 @@ describe('Term Deposit Calculator Tests', () => {
   });
 
   it('should calculate monthly repayment at the $20,000 tax threshold', async () => {
-    const result = await calculateBorrowingPower(
+    const result = await calculator.calculateBorrowingPower(
       20000, 0, 0, 0, 7.5
     );
 
@@ -192,44 +188,44 @@ describe('Term Deposit Calculator Tests', () => {
   });
 
   it('should calculate monthly repayment just above the $20,000 tax threshold', async () => {
-    const result = await calculateBorrowingPower(
+    const result = await calculator.calculateBorrowingPower(
       20001, 0, 0, 0, 7.5
     );
 
     assert.strictEqual(result.monthlyRepayment, 66.75);
   });
   it('should calculate monthly repayment just below the $50,000 tax threshold', async () => {
-    const result = await calculateBorrowingPower(49999, 0, 0, 0, 7.5);
+    const result = await calculator.calculateBorrowingPower(49999, 0, 0, 0, 7.5);
 
     assert.strictEqual(result.monthlyRepayment, 2191.58);
   });
 
   it('should calculate monthly repayment at the $50,000 tax threshold', async () => {
-    const result = await calculateBorrowingPower(50000, 0, 0, 0, 7.5);
+    const result = await calculator.calculateBorrowingPower(50000, 0, 0, 0, 7.5);
 
     assert.strictEqual(result.monthlyRepayment, 2191.67);
   });
 
   it('should calculate monthly repayment just above the $50,000 tax threshold', async () => {
-    const result = await calculateBorrowingPower(50001, 0, 0, 0, 7.5);
+    const result = await calculator.calculateBorrowingPower(50001, 0, 0, 0, 7.5);
 
     assert.strictEqual(result.monthlyRepayment, 2191.75);
   });
 
   it('should calculate monthly repayment just below the $100,000 tax threshold', async () => {
-    const result = await calculateBorrowingPower(99999, 0, 0, 0, 7.5);
+    const result = await calculator.calculateBorrowingPower(99999, 0, 0, 0, 7.5);
 
     assert.strictEqual(result.monthlyRepayment, 4716.58);
   });
 
   it('should calculate monthly repayment at the $100,000 tax threshold', async () => {
-    const result = await calculateBorrowingPower(100000, 0, 0, 0, 7.5);
+    const result = await calculator.calculateBorrowingPower(100000, 0, 0, 0, 7.5);
 
     assert.strictEqual(result.monthlyRepayment, 4716.67);
   });
 
   it('should calculate monthly repayment just above the $100,000 tax threshold', async () => {
-    const result = await calculateBorrowingPower(100001, 0, 0, 0, 7.5);
+    const result = await calculator.calculateBorrowingPower(100001, 0, 0, 0, 7.5);
 
     assert.strictEqual(result.monthlyRepayment, 4716.75);
   });
