@@ -7,6 +7,7 @@ const assert = require('assert');
 const { BorrowingCalculator } = require('./borrowingCalculator');
 
 const calculator = new BorrowingCalculator({ authToken: 'pat_abcdefghijklmnopqrstuvwxyz0123456789' });
+const unauthCalculator = new BorrowingCalculator({ authToken: 'wrong_token' });
 
 describe('Testing validateIncome', () => {
   it('should return true for a valid integer value', () => {
@@ -36,6 +37,14 @@ describe('Testing validateIncome', () => {
       {
         name: 'Error',
         message: 'Income needs to be positive'
+      }
+    )
+  });
+  it('should throw an error if income is Infinity', () => {
+    assert.throws(() => calculator.validateIncome(Infinity),
+      {
+        name: 'Error',
+        message: 'Infinity cannot be used as an argument'
       }
     )
   });
@@ -71,12 +80,29 @@ describe('Testing validateDependents', () => {
         message: 'Dependents needs to be zero or a positive number'
       }
     )
-
   });
 })
 
-describe.only('Term Deposit Calculator Tests', () => {
+describe.only('Testing getTax', () => {
+  it('should return a tax value for a valid income', async () => {
+    const tax = await calculator.getTax(120000);
+    assert.strictEqual(tax, 24000);
+  });
+  it('should throw an error for invalid income', async () => {
+    await assert.rejects(
+      () => calculator.getTax("meow"),
+      { message: 'Income needs to be a float number' }
+    );
+  });
+  it('should return an error for unauthorized API access', async () => {
+    await assert.rejects(
+      () => unauthCalculator.getTax(120000, 1, 2000, 10000, 7.0),
+      { message: 'Request for tax has failed: Request for tax has failed: 401' }
+    );
+  });
+});
 
+describe('Term Deposit Calculator Tests', () => {
   // Validation error tests
   it('should return an error for negative income', async () => {
     await assert.rejects(

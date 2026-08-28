@@ -14,6 +14,7 @@ class BorrowingCalculator {
         this.apiBaseUrl = apiBaseUrl;
         this.authToken = authToken;
     }
+
     validateIncome(income) {
         if (isNaN(income)) {
             throw new Error(`Income needs to be a float number`);
@@ -24,29 +25,31 @@ class BorrowingCalculator {
         }
         return true;
     }
+
     validateDependents(dependents) {
         if (isNaN(dependents) || Number.isInteger(dependents) === false) {
             throw new Error(`Dependents needs to be a number`);
-        } else if (!Number.isFinite(dependents)) {
-            throw new Error(`Infinity cannot be used as an argument`);
         } else if (dependents < 0) {
             throw new Error(`Dependents needs to be zero or a positive number`);
         };
         return true;
     }
+
     // Tax function w/ API call
     async getTax(income) {
         this.validateIncome(income);
-        let response;
         try {
-            response = await fetch(`${this.apiBaseUrl}/api/tax?income=${encodeURIComponent(income)}`,
+            const response = await fetch(`${this.apiBaseUrl}/api/tax?income=${encodeURIComponent(income)}`,
                 { headers: { Authorization: `Bearer ${this.authToken}` } });
-
-            const data = await response.json();
-
-            return data.tax;
-        } catch (error) {
+            if (response.ok) {
+                const data = await response.json();
+                console.log(data);
+                return data.tax;
+            }
             throw new Error(`Request for tax has failed: ${response.status}`);
+
+        } catch (error) {
+            throw new Error(`Request for tax has failed: ${error.message}`);
         }
     }
 
@@ -54,17 +57,17 @@ class BorrowingCalculator {
     async getHEM(income, dependents) {
         this.validateIncome(income);
         this.validateDependents(dependents);
-        let response;
         try {
-            response = await fetch(`${this.apiBaseUrl}/api/hem?income=${encodeURIComponent(income)}&dependents=${encodeURIComponent(dependents)}`,
+            const response = await fetch(`${this.apiBaseUrl}/api/hem?income=${encodeURIComponent(income)}&dependents=${encodeURIComponent(dependents)}`,
                 { headers: { Authorization: `Bearer ${this.authToken}` } });
 
-
-            const data = await response.json();
-            // TODO: handle errors from API
-            return data.hem;
-        } catch (error) {
+            if (response.ok) {
+                const data = await response.json();
+                return data.hem;
+            }
             throw new Error(`Request for HEM has failed: ${response.status}`);
+        } catch (error) {
+            throw new Error(`Request for HEM has failed: ${error.message}`);
         }
     }
 
@@ -139,10 +142,10 @@ class BorrowingCalculator {
             rl.close();
         }
     }
-
 }
 
 if (require.main === module) {
     new BorrowingCalculator({ authToken: "pat_abcdefghijklmnopqrstuvwxyz0123456789" }).runConsoleMode();
 }
+
 module.exports = { BorrowingCalculator };
