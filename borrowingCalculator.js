@@ -37,8 +37,9 @@ class BorrowingCalculator {
     // Tax function w/ API call
     async getTax(income) {
         this.validateIncome(income);
+        let response;
         try {
-            const response = await fetch(`${this.apiBaseUrl}/api/tax?income=${encodeURIComponent(income)}`,
+            response = await fetch(`${this.apiBaseUrl}/api/tax?income=${encodeURIComponent(income)}`,
                 { headers: { Authorization: `Bearer ${this.authToken}` } });
 
             const data = await response.json();
@@ -53,8 +54,9 @@ class BorrowingCalculator {
     async getHEM(income, dependents) {
         this.validateIncome(income);
         this.validateDependents(dependents);
+        let response;
         try {
-            const response = await fetch(`${this.apiBaseUrl}/api/hem?income=${encodeURIComponent(income)}&dependents=${encodeURIComponent(dependents)}`,
+            response = await fetch(`${this.apiBaseUrl}/api/hem?income=${encodeURIComponent(income)}&dependents=${encodeURIComponent(dependents)}`,
                 { headers: { Authorization: `Bearer ${this.authToken}` } });
 
 
