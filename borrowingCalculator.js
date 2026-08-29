@@ -43,7 +43,6 @@ class BorrowingCalculator {
                 { headers: { Authorization: `Bearer ${this.authToken}` } });
             if (response.ok) {
                 const data = await response.json();
-                console.log(data);
                 return data.tax;
             }
             throw new Error(`Request for tax has failed: ${response.status}`);

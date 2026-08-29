@@ -3,6 +3,7 @@
  */
 
 
+const sinon = require('sinon');
 const assert = require('assert');
 const { BorrowingCalculator } = require('./borrowingCalculator');
 
@@ -83,7 +84,7 @@ describe('Testing validateDependents', () => {
   });
 })
 
-describe.only('Testing getTax', () => {
+describe('Testing getTax', () => {
   it('should return a tax value for a valid income', async () => {
     const tax = await calculator.getTax(120000);
     assert.strictEqual(tax, 24000);
@@ -99,6 +100,66 @@ describe.only('Testing getTax', () => {
       () => unauthCalculator.getTax(120000, 1, 2000, 10000, 7.0),
       { message: 'Request for tax has failed: Request for tax has failed: 401' }
     );
+  });
+});
+
+describe('Testing getHEM', () => {
+  it('should return a HEM value for valid income and dependents', async () => {
+    const hem = await calculator.getHEM(120000, 1);
+    assert.strictEqual(hem, 2700);
+  });
+  it('should throw an error for invalid income', async () => {
+    await assert.rejects(
+      () => calculator.getHEM("meow", 1),
+      { message: 'Income needs to be a float number' }
+    );
+  });
+  it('should throw an error for invalid dependents', async () => {
+    await assert.rejects(
+      () => calculator.getHEM(120000, "meow"),
+      { message: 'Dependents needs to be a number' }
+    );
+  });
+  it('should throw an error for negative dependents', async () => {
+    await assert.rejects(
+      () => calculator.getHEM(120000, -1),
+      { message: 'Dependents needs to be zero or a positive number' }
+    );
+  });
+});
+
+describe('Testing getHEM errors with stubbing', () => {
+  const calculator = new BorrowingCalculator({ authToken: 'pat_test' });
+  let fetchStub;
+  beforeEach(() => {
+    fetchStub = sinon.stub(global, 'fetch');
+  });
+  afterEach(() => {
+    fetchStub.restore();
+  });
+  it('should throw an error on a network failure', async () => {
+    fetchStub.rejects(new TypeError('fetch failed'));
+    await assert.rejects(
+      () => calculator.getHEM(120000, 1),
+      { message: 'Request for HEM has failed: fetch failed' }
+    );
+  });
+  it('should throw an error when API returns a non-ok response', async () => {
+    fetchStub.resolves({
+      ok: false, status: 500, json: async () => ({})
+    });
+    await assert.rejects(
+      () => calculator.getHEM(120000, 1),
+      { message: 'Request for HEM has failed: Request for HEM has failed: 500' }
+    );
+  });
+  it('should call fetch with the expected URL and auth header', async () => {
+    fetchStub.resolves({ ok: true, status: 200, json: async () => ({ hem: 2700 }) });
+    await calculator.getHEM(120000, 1);
+    assert.strictEqual(fetchStub.calledOnce, true);
+    const [url, options] = fetchStub.firstCall.args;
+    assert.ok(url.includes('/api/hem?income=120000&dependents=1'));
+    assert.strictEqual(options.headers.Authorization, 'Bearer pat_test');
   });
 });
 
