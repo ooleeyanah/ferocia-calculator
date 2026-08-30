@@ -227,6 +227,12 @@ describe('Term Deposit Calculator Tests', () => {
     },
       Error, `All arguments must be numbers`);
   });
+  it('should throw an error when any argument is NaN', async () => {
+    await assert.rejects(
+      () => calculator.calculateBorrowingPower(NaN, 1, 3000, 10000, 7.0),
+      { message: 'All arguments must be numbers' }
+    );
+  });
   // Expense/affordability 
   it('should use expenses if it is higher than baselineHEM', async () => {
     const result = await calculator.calculateBorrowingPower(120000, 2, 3000, 10000, 7.5);

@@ -77,7 +77,7 @@ class BorrowingCalculator {
         if ([income, dependents, expenses, creditLimits, annualAssessmentRate].some(p => p === undefined)) {
             throw new Error(`All arguments are required`);
         }
-        if ([income, dependents, expenses, creditLimits, annualAssessmentRate].some(p => p === NaN)) {
+        if ([income, dependents, expenses, creditLimits, annualAssessmentRate].some(p => Number.isNaN(p))) {
             throw new Error(`All arguments must be numbers`);
         }
 
