@@ -179,6 +179,13 @@ describe('Term Deposit Calculator Tests', () => {
     );
   });
 
+  // it('should return an error for negative expenses', async () => {
+  //   await assert.rejects(
+  //     () => calculator.calculateBorrowingPower(120000, 1, -2000, 10000, 7.0),
+  //     { message: 'All arguments must be numbers' }
+  //   );
+  // });
+
   it('should return an error for non-numeric dependents', async () => {
     await assert.rejects(
       () => calculator.calculateBorrowingPower(120000, "meow", 2000, 10000, 7.0),
@@ -324,3 +331,55 @@ describe('Term Deposit Calculator Tests', () => {
   });
 })
 
+describe('Testing runConsoleMode', () => {
+  let sandbox;
+  let readlineStub;
+  let consoleLogStub;
+  let consoleErrorStub;
+  let calculateStub;
+
+  beforeEach(() => {
+    sandbox = sinon.createSandbox();
+    consoleLogStub = sandbox.stub(console, 'log');
+    consoleErrorStub = sandbox.stub(console, 'error');
+    calculateStub = sandbox.stub(BorrowingCalculator.prototype, 'calculateBorrowingPower');
+    readlineStub = { question: sandbox.stub(), close: sandbox.stub() };
+    sandbox.stub(require('node:readline/promises'), 'createInterface').returns(readlineStub);
+  });
+
+  afterEach(() => {
+    sandbox.restore();
+  });
+  it('should prompt for all required inputs and display results', async () => {
+    readlineStub.question
+      .onFirstCall().resolves('120000')
+      .onSecondCall().resolves('2')
+      .onThirdCall().resolves('3000')
+      .onCall(3).resolves('10000');
+
+    calculateStub.resolves({ maxLoanAmount: 500000, monthlyRepayment: 4600 });
+
+    const calc = new BorrowingCalculator({ authToken: 'test' });
+    await calc.runConsoleMode();
+
+    assert.strictEqual(readlineStub.question.callCount, 4);
+    assert.ok(consoleLogStub.calledWith('Mortgage Borrowing Power Calculator'));
+    assert.ok(consoleLogStub.calledWithMatch(/Maximum Borrowing Power/));
+    assert.ok(readlineStub.close.called);
+  });
+  it('should catch errors and log without crashing', async () => {
+    readlineStub.question
+      .onFirstCall().resolves('-120000')
+      .onSecondCall().resolves('2')
+      .onThirdCall().resolves('3000')
+      .onCall(3).resolves('10000');
+
+    calculateStub.rejects(new Error('Test error'));
+
+    const calc = new BorrowingCalculator({ authToken: 'test' });
+    await calc.runConsoleMode();
+
+    assert.ok(consoleErrorStub.calledWithMatch(/Test error/));
+    assert.ok(readlineStub.close.called);
+  });
+});
