@@ -26,9 +26,7 @@ This class is then exported to be used in test_calculator.js. See test commands 
 
 ### Test coverage
 
-
-
-
+Test coverage is run with Istanbul and the nyc command alongside mocha. Coverage of borrowingCalculator.js is at 98.57%.
 
 ## Setup
 
